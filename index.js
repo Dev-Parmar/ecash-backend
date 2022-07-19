@@ -12,7 +12,24 @@ app.use(cors())
 app.post('/register', async (req, res) => {
     let data = new userModel(req.body);
     let result = await data.save()
-    res.send(result)
+    let ores = result.toObject()
+    delete ores.password
+    res.send(ores)
 })
+
+app.post('/login', async (req, res) => {
+
+    if (req.body.email && req.body.password) {
+        let data = await userModel.findOne(req.body).select('-password')
+        if (data) {
+            res.send(data)
+        } else {
+            res.send({ result: "No user found" })
+        }
+    } else {
+        res.send({ result: "Input fields empty" })
+    }
+})
+
 
 app.listen(6969)
