@@ -3,6 +3,7 @@ require('./db/config')
 const express = require('express')
 const mongoose = require('mongoose')
 const userModel = require('./db/User')
+const productModel = require('./db/Product')
 const cors = require('cors')
 const app = express()
 
@@ -31,5 +32,10 @@ app.post('/login', async (req, res) => {
     }
 })
 
+app.post('/add-product', async (req, res) => {
+    let data = new productModel(req.body)
+    let result = await data.save()
+    res.send(result)
+})
 
 app.listen(6969)
