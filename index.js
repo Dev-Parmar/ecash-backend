@@ -38,4 +38,34 @@ app.post('/add-product', async (req, res) => {
     res.send(result)
 })
 
+app.get('/products', async (req, res) => {
+    let data = await productModel.find()
+    if (data.length > 0) {
+        res.send(data)
+    } else {
+        res.send({ result: "No Products Found!" })
+    }
+})
+
+app.delete('/product/:id', async (req, res) => {
+    let data = await productModel.deleteOne({ _id: req.params.id })
+    res.send(data)
+})
+
+app.post('/search/:key', async (req, res) => {
+    let data = await productModel.find({
+        "$or": [
+            { "name": { $regex: req.params.key } },
+            { "price": { $regex: req.params.key } },
+            { "company": { $regex: req.params.key } }
+        ]
+    })
+    if (data.length > 0) {
+        res.send(data)
+    } else {
+        res.send({ result: "No Product Found!" })
+    }
+})
+
+
 app.listen(6969)
