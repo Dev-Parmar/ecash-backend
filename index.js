@@ -38,6 +38,11 @@ app.post('/add-product', async (req, res) => {
     res.send(result)
 })
 
+app.post('/update-product/:id', async (req, res) => {
+    let data = await productModel.updateOne({ _id: req.params.id }, { $set: req.body })
+    res.send(data)
+})
+
 app.get('/products', async (req, res) => {
     let data = await productModel.find()
     if (data.length > 0) {
@@ -50,6 +55,15 @@ app.get('/products', async (req, res) => {
 app.delete('/product/:id', async (req, res) => {
     let data = await productModel.deleteOne({ _id: req.params.id })
     res.send(data)
+})
+
+app.post('/search-id/:id', async (req, res) => {
+    let data = await productModel.find({ _id: req.params.id })
+    if (data.length > 0) {
+        res.send(data)
+    } else {
+        res.send({ result: "No Product Found!" })
+    }
 })
 
 app.post('/search/:key', async (req, res) => {
