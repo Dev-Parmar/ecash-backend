@@ -14,7 +14,6 @@ app.use(cors())
 
 const verifyToken = (req, res, next) => {
     let token = req.headers['authorization']
-    console.log(token)
     if (token) {
         let t = token.split(' ')[1]
         JWT.verify(t, jwtKey, (err, valid) => {
