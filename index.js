@@ -5,7 +5,9 @@ const mongoose = require('mongoose')
 const userModel = require('./db/User')
 const productModel = require('./db/Product')
 const cors = require('cors')
+const JWT = require('jsonwebtoken')
 const app = express()
+const jwtKey = 'ecash'
 
 app.use(express.json())
 app.use(cors())
@@ -15,15 +17,31 @@ app.post('/register', async (req, res) => {
     let result = await data.save()
     let ores = result.toObject()
     delete ores.password
-    res.send(ores)
+    if (ores) {
+        JWT.sign({ data }, jwtKey, { expiresIn: '2h' }, (err, token) => {
+            if (err) {
+                res.send({ result: "Something went wrong" })
+            } else {
+                res.send({ data, auth: token })
+            }
+        })
+    } else {
+        res.send({ result: "Registration failed!" })
+    }
 })
 
 app.post('/login', async (req, res) => {
 
     if (req.body.email && req.body.password) {
-        let data = await userModel.findOne(req.body).select('-password')
-        if (data) {
-            res.send(data)
+        let user = await userModel.findOne(req.body).select('-password')
+        if (user) {
+            JWT.sign({ user }, jwtKey, { expiresIn: '2h' }, (err, token) => {
+                if (err) {
+                    res.send({ result: "Something went wrong" })
+                } else {
+                    res.send({ user, auth: token })
+                }
+            })
         } else {
             res.send({ result: "No user found" })
         }
