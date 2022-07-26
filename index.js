@@ -12,6 +12,24 @@ const jwtKey = 'ecash'
 app.use(express.json())
 app.use(cors())
 
+const verifyToken = (req, res, next) => {
+    let token = req.headers['authorization']
+    console.log(token)
+    if (token) {
+        let t = token.split(' ')[1]
+        JWT.verify(t, jwtKey, (err, valid) => {
+            if (err) {
+                res.status(403).send({ result: "Wrong Token" })
+            } else {
+                next()
+            }
+        })
+    } else {
+        res.status(401).send({ result: "Token not Provided" })
+    }
+
+}
+
 app.post('/register', async (req, res) => {
     let data = new userModel(req.body);
     let result = await data.save()
@@ -50,18 +68,18 @@ app.post('/login', async (req, res) => {
     }
 })
 
-app.post('/add-product', async (req, res) => {
+app.post('/add-product', verifyToken, async (req, res) => {
     let data = new productModel(req.body)
     let result = await data.save()
     res.send(result)
 })
 
-app.post('/update-product/:id', async (req, res) => {
+app.post('/update-product/:id', verifyToken, async (req, res) => {
     let data = await productModel.updateOne({ _id: req.params.id }, { $set: req.body })
     res.send(data)
 })
 
-app.get('/products', async (req, res) => {
+app.get('/products', verifyToken, async (req, res) => {
     let data = await productModel.find()
     if (data.length > 0) {
         res.send(data)
@@ -70,12 +88,12 @@ app.get('/products', async (req, res) => {
     }
 })
 
-app.delete('/product/:id', async (req, res) => {
+app.delete('/product/:id', verifyToken, async (req, res) => {
     let data = await productModel.deleteOne({ _id: req.params.id })
     res.send(data)
 })
 
-app.post('/search-id/:id', async (req, res) => {
+app.post('/search-id/:id', verifyToken, async (req, res) => {
     let data = await productModel.find({ _id: req.params.id })
     if (data.length > 0) {
         res.send(data)
@@ -84,7 +102,7 @@ app.post('/search-id/:id', async (req, res) => {
     }
 })
 
-app.post('/search/:key', async (req, res) => {
+app.post('/search/:key', verifyToken, async (req, res) => {
     let data = await productModel.find({
         "$or": [
             { "name": { $regex: req.params.key } },
