@@ -1,5 +1,5 @@
 require('./db/config')
-
+const { ObjectId } = require('mongodb')
 const express = require('express')
 const mongoose = require('mongoose')
 const userModel = require('./db/User')
@@ -78,13 +78,14 @@ app.post('/update-product/:id', verifyToken, async (req, res) => {
     res.send(data)
 })
 
-app.get('/products', verifyToken, async (req, res) => {
-    let data = await productModel.find()
-    if (data.length > 0) {
-        res.send(data)
-    } else {
-        res.send({ result: "No Products Found!" })
-    }
+app.get('/products', async (req, res) => {
+    let id = '62df3586f3d0838a8ed0b9ad'
+    let data = await productModel.createIndexes({ _id: 1 })
+
+    res.send({
+        data: data
+    })
+
 })
 
 app.delete('/product/:id', verifyToken, async (req, res) => {
