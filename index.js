@@ -79,8 +79,7 @@ app.post('/update-product/:id', verifyToken, async (req, res) => {
 })
 
 app.get('/products', async (req, res) => {
-    let id = '62df3586f3d0838a8ed0b9ad'
-    let data = await productModel.createIndexes({ _id: 1 })
+    let data = await productModel.find()
 
     res.send({
         data: data
