@@ -81,9 +81,11 @@ app.post('/update-product/:id', verifyToken, async (req, res) => {
 app.get('/products', async (req, res) => {
     let data = await productModel.find()
 
-    res.send({
-        data: data
-    })
+    if (data.length > 0) {
+        res.send(data)
+    } else {
+        res.send({ result: "No Product Found!" })
+    }
 
 })
 
